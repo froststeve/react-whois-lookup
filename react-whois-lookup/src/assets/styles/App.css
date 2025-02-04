@@ -147,6 +147,7 @@ button:hover {
 
 input {
   width: 400px;
+  max-width: fit-content;
   background-color: var(--primary-white);
   height: 50px;
   border-radius: var(--primary-border-radius-large);
