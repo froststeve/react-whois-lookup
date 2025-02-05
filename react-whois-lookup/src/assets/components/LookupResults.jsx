@@ -21,12 +21,12 @@ function LookupResults({ domain }) {
     setLoggedOn(isLoggedOn);
 
     // Check Local Storage
-    ApiLayerApiKey = localStorage.getItem("ApiLayearApiKey");
+    ApiLayerApiKey = localStorage.getItem("ApiLayarApiKey");
     // console.log(`ApiLayerApiKey from Local Storage = ${ApiLayerApiKey}`);
 
     // If not there, check .env
     if (!ApiLayerApiKey || ApiLayerApiKey === null) {
-      ApiLayerApiKey = import.meta.env.VITaE_APILAYER_API_KEY;
+      ApiLayerApiKey = import.meta.env.VITE_APILAYER_API_KEY;
       //   console.log(`ApiLayerApiKey from .env = ${ApiLayerApiKey}`);
     }
 
