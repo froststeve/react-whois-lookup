@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // **************************************************************************
 // LookupResults
@@ -7,35 +7,49 @@ function LookupResults({ domain }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  console.log(`LOOKUPRESULTS: domain = ${domain}`);
-  console.log(`LOOKUPRESULTS: loading = ${loading}`);
+  const [loggedOn, setLoggedOn] = useState(false);
+  const [apiKey, setApiKey] = useState(null);
 
   // **************************************************************************
   // getApiKey
   // **************************************************************************
   function getApiKey() {
+    let isLoggedOn = false;
+    let ApiLayerApiKey = null;
+
+    setApiKey(ApiLayerApiKey);
+    setLoggedOn(isLoggedOn);
+
     // Check Local Storage
-    let ApiLayerApiKey = localStorage.getItem("ApiLayerApiKey");
+    ApiLayerApiKey = localStorage.getItem("ApiLayearApiKey");
     // console.log(`ApiLayerApiKey from Local Storage = ${ApiLayerApiKey}`);
 
     // If not there, check .env
-    if (ApiLayerApiKey === null) {
-      ApiLayerApiKey = import.meta.env.VITE_APILAYER_API_KEY;
+    if (!ApiLayerApiKey || ApiLayerApiKey === null) {
+      ApiLayerApiKey = import.meta.env.VITaE_APILAYER_API_KEY;
       //   console.log(`ApiLayerApiKey from .env = ${ApiLayerApiKey}`);
     }
-    if (!ApiLayerApiKey) {
-      console.log("a ask user for Key");
+
+    // If not there, get from user
+    if (!ApiLayerApiKey || ApiLayerApiKey === null) {
+      const userApi = prompt(
+        "You must provide a valid API key to use this feature."
+      );
+      if (userApi && userApi.length > 0) {
+        ApiLayerApiKey = userApi;
+        // console.log(`ApiLayerApiKey from user = ${ApiLayerApiKey}`);
+      }
     }
 
-    if (ApiLayerApiKey === null) {
-      console.log("b ask user for Key");
-    }
-
-    if (ApiLayerApiKey != null) {
-      //   localStorage.setItem("ApiLayerApiKey", JSON.stringify(ApiLayerApiKey));
-      localStorage.setItem("ApiLayerApiKey", ApiLayerApiKey);
+    // If not there, set notLoggedIn, otherwise, set loggedIn
+    if (!ApiLayerApiKey || ApiLayerApiKey === null) {
+      isLoggedOn = false;
+      setLoggedOn(isLoggedOn);
     } else {
-      console.log("ask user for Keyn");
+      localStorage.setItem("ApiLayerApiKey", ApiLayerApiKey);
+      setApiKey(ApiLayerApiKey);
+      isLoggedOn = true;
+      setLoggedOn(isLoggedOn);
     }
 
     return ApiLayerApiKey;
@@ -46,13 +60,10 @@ function LookupResults({ domain }) {
   // **************************************************************************
   function stripUrl(domain = "dummy", subdomain = false) {
     let url = domain;
-    // console.log(`stripUrl pre url = ${url}`);
-    // let strippedUrl = url.replace(/(^\w+:|^)\/\//, "");
     let strippedUrl = url.replace(/(^\w+:|^)\/\/|\/.*$/g, "");
     if (subdomain) {
       strippedUrl = strippedUrl.replace("www.", "");
     }
-    console.log(`old = ${domain} new = ${strippedUrl}`);
 
     return strippedUrl;
   }
@@ -62,7 +73,6 @@ function LookupResults({ domain }) {
   // **************************************************************************
   function fetchApiData(apiKey, strippedUrl) {
     // Set up headers
-    console.log("in fetchApiData");
     let myHeaders = new Headers();
     myHeaders.append("apikey", apiKey);
     let requestOptions = {
@@ -84,6 +94,7 @@ function LookupResults({ domain }) {
           if (!response.ok) {
             const error = new Error(`HTTP error! status: ${response.status}`);
             error.data = data;
+            error.status = response.status;
             throw error;
           }
           return data;
@@ -98,6 +109,10 @@ function LookupResults({ domain }) {
         setData(error.data || null); // Still set the data if available
         setLoading(false);
         setError(true);
+        if (error.status === 401) {
+          setApiKey(null);
+          setLoggedOn(false);
+        }
       });
   }
 
@@ -110,27 +125,43 @@ function LookupResults({ domain }) {
   // **************************************************************************
 
   useEffect(() => {
-    // Only run the functions if we actually have a domain
-    if (domain === null || domain === undefined || domain.length <= 0) {
-      //   console.log("no domain");
+    // Get the API Key
+    if (!loggedOn) {
+      setApiKey(getApiKey());
     } else {
-      // Get the API Key
-      const apiKey = getApiKey();
-      // Get the domain
-      const strippedUrl = stripUrl(domain);
-      // Get the data
-      fetchApiData(apiKey, strippedUrl);
+      // Only run the functions if we actually have a domain
+      if (domain === null || domain === undefined || domain.length <= 0) {
+        // Do nothing and carry on
+      } else {
+        // Get the domain
+        const subdomain = true;
+        const strippedUrl = stripUrl(domain, subdomain);
+        // Get the data
+        fetchApiData(apiKey, strippedUrl);
+      }
     }
-  }, [domain]);
+  }, [domain, apiKey, loggedOn]);
 
   // **************************************************************************
   // Conditional Returns
   // **************************************************************************
 
+  if (!loggedOn) {
+    return (
+      <>
+        <div className="lookup-results">
+          <h2>No API key found</h2>
+          <p>You must provide a valid API key to use this feature.</p>
+          <br />
+        </div>
+      </>
+    );
+  }
+
   if (domain === null || domain === undefined || domain.length <= 0) {
     return (
       <>
-        <div>
+        <div className="lookup-results">
           <h3>Which TLDs are supported?</h3>
           <p>
             TLDs currently supported are as follows: .com .me .net .org .sh .io
@@ -149,23 +180,26 @@ function LookupResults({ domain }) {
   if (error) {
     return (
       <>
-        <h2>Error</h2>
-        <p>
-          There was an error fetching the data for <strong>{domain}</strong>
-          <br />
-          Please try again later.
-        </p>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
+        <div className="lookup-results">
+          <h2>Error</h2>
+          <p>
+            There was an error fetching the data for <strong>{domain}</strong>
+            <br />
+            Please try again later.
+          </p>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
       </>
     );
   }
 
-  console.log(`loading (if) = ${loading}`);
   if (loading) {
     return (
       <>
-        <h2>Waiting...</h2>
-        <p>Please be patient</p>
+        <div className="lookup-results">
+          <h2>Waiting...</h2>
+          <p>Please be patient</p>
+        </div>
       </>
     );
   }
@@ -174,12 +208,15 @@ function LookupResults({ domain }) {
   // Final return...
   // **************************************************************************
   return (
-    <div>
+    <div className="lookup-results">
       <h2>Results</h2>
       <p>
         Results for <strong>{domain}</strong>
       </p>
       <pre>{JSON.stringify(data, null, 2)}</pre>
+      <br />
+      <br />
+      <br />
     </div>
   );
 }

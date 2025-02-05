@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const LookupInnerInput = ({ onDomainChange }) => {
-  //   console.log("A");
-  //   console.log({ onDomainChange });
-  //   console.log("B");
-
   const [domain, setDomain] = useState("");
 
   // Focus on the input when the component mounts

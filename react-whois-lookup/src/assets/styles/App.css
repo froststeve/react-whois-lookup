@@ -103,6 +103,14 @@ body {
   padding: 0 10%;
 }
 
+pre {
+  white-space: pre-wrap; /* Allows text to wrap */
+  word-break: break-word; /* Break long words if necessary */
+  overflow-x: auto; /* Enables horizontal scrolling as a fallback */
+  max-width: 100%; /* Prevents stretching the layout */
+  padding: 1rem;
+}
+
 .navbar {
   position: sticky;
   height: 65px;
