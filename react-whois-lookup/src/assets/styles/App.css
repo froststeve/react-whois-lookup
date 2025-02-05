@@ -166,6 +166,12 @@ input {
   border: 0.5px solid;
 }
 
+a,
+a:visited {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
 .footer {
   background-color: var(--primary-black);
   color: var(--primary-white);
@@ -179,8 +185,8 @@ input {
   bottom: 0;
 }
 
-footer a,
-a:visited {
+.footer a,
+.footer a:visited {
   color: var(--primary-white);
   text-decoration: none;
 }

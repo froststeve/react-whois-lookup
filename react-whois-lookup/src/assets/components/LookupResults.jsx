@@ -175,6 +175,9 @@ function LookupResults({ domain }) {
             .science .sex .shop .solutions .so .studio .style .tech .travel .vc
             .pub .pro .app .press .ooo .de
           </p>
+          <p>
+            Data supplied by <a href="https://apilayer.com/">APILayer</a>
+          </p>
         </div>
       </>
     );
@@ -217,6 +220,10 @@ function LookupResults({ domain }) {
         Results for <strong>{domain}</strong>
       </p>
       <pre>{JSON.stringify(data, null, 2)}</pre>
+      <p>
+        Data supplied by <a href="https://apilayer.com/">APILayer</a>
+      </p>
+
       <br />
       <br />
       <br />
