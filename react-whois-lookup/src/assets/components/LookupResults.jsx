@@ -152,6 +152,9 @@ function LookupResults({ domain }) {
         <div className="lookup-results">
           <h2>No API key found</h2>
           <p>You must provide a valid API key to use this feature.</p>
+          <p>
+            Get one from <a href="https://apilayer.com/">APILayer</a>
+          </p>
           <br />
         </div>
       </>
