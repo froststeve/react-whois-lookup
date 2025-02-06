@@ -21,7 +21,7 @@ function LookupResults({ domain }) {
     setLoggedOn(isLoggedOn);
 
     // Check Local Storage
-    ApiLayerApiKey = localStorage.getItem("ApiLayarApiKey");
+    ApiLayerApiKey = localStorage.getItem("ApiLayerApiKey");
     // console.log(`ApiLayerApiKey from Local Storage = ${ApiLayerApiKey}`);
 
     // If not there, check .env
